@@ -8,6 +8,7 @@ require (
 	github.com/form3tech-oss/jwt-go v3.2.2+incompatible // indirect
 	github.com/golang-migrate/migrate v3.5.4+incompatible // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
+	github.com/joho/godotenv v1.3.0 // indirect
 	github.com/lib/pq v1.10.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/stretchr/objx v0.3.0 // indirect
