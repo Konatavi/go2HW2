@@ -1,6 +1,6 @@
 package apiserver
 
-import "github.com/vlasove/10.JWTAuth/store"
+import "github.com/Konatavi/go2HW2/store"
 
 //General config for rest api
 type Config struct {

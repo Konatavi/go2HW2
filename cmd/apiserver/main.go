@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/BurntSushi/toml"
-	"github.com/vlasove/10.JWTAuth/internal/app/apiserver"
+	"github.com/Konatavi/go2HW2/internal/app/apiserver"
 )
 
 var (

@@ -3,10 +3,10 @@ package apiserver
 import (
 	"net/http"
 
+	"github.com/Konatavi/go2HW2/internal/app/middleware"
+	"github.com/Konatavi/go2HW2/store"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
-	"github.com/vlasove/10.JWTAuth/internal/app/middleware"
-	"github.com/vlasove/10.JWTAuth/store"
 )
 
 var (
@@ -57,19 +57,53 @@ func (s *APIServer) configureLogger() error {
 
 //func for configure Router
 func (s *APIServer) configureRouter() {
-	s.router.HandleFunc(prefix+"/articles", s.GetAllArticles).Methods("GET")
-	//Было до JWT
-	//s.router.HandleFunc(prefix+"/articles"+"/{id}", s.GetArticleById).Methods("GET")
-	//Теперь требует наличия JWT
-	s.router.Handle(prefix+"/articles"+"/{id}", middleware.JwtMiddleware.Handler(
-		http.HandlerFunc(s.GetArticleById),
+
+	/// Необходимые роутеры
+
+	// 1) POST /register - позволяет зарегестрировать нового пользователя для API. Завершается кодом
+	//201 и сообщением {"Message" : "User created. Try to auth"} в случае, если такого
+	//пользователя еще не было в БД. В противном случае завершаемся кодом 400 и сообщением
+	//{"Error" : "User already exists"}.
+	s.router.HandleFunc(prefix+"/register", s.PostUserRegister).Methods("POST")
+
+	// 2) POST /auth - возвращает JWT метку для зарегестрированных пользователей.
+	s.router.HandleFunc(prefix+"/auth", s.PostToAuth).Methods("POST")
+
+	// 3) GET /auto/<string:mark> - возвращает информацию про автомобиль с именем mark и код 200.
+	//В случае, если автомобиля нет в БД в текущий момент возвращаем {"Error" : "Auto with
+	//that mark not found"} и код 404.
+	s.router.Handle(prefix+"/auto"+"/{mark}", middleware.JwtMiddleware.Handler(
+		http.HandlerFunc(s.GetAutoByMark),
 	)).Methods("GET")
-	//
-	s.router.HandleFunc(prefix+"/articles"+"/{id}", s.DeleteArticleById).Methods("DELETE")
-	s.router.HandleFunc(prefix+"/articles", s.PostArticle).Methods("POST")
-	s.router.HandleFunc(prefix+"/user/register", s.PostUserRegister).Methods("POST")
-	//new pair for auth
-	s.router.HandleFunc(prefix+"/user/auth", s.PostToAuth).Methods("POST")
+
+	// 4) POST /auto/<string:mark> - добавляет автомобиль с именем mark в БД. В случае успеха - 201 и
+	//сообщение {"Message" : "Auto created"}. В случае, если автомобиль с таким именем уже
+	//существует - 400 и {"Error" : "Auto with that mark exists"}.
+	s.router.Handle(prefix+"/auto"+"/{mark}", middleware.JwtMiddleware.Handler(
+		http.HandlerFunc(s.PostAuto),
+	)).Methods("POST")
+
+	// 5) PUT /auto/<string:mark> - обновляет информацию про автомобиль с именем mark в БД. В
+	//случае успеха - 202 и сообщение {"Message" : "Auto updated"}. В случае, если автомобиля нет
+	//в БД в текущий момент возвращаем {"Error" : "Auto with that mark not found"} и код 404.
+	s.router.Handle(prefix+"/auto"+"/{mark}", middleware.JwtMiddleware.Handler(
+		http.HandlerFunc(s.PutAuto),
+	)).Methods("PUT")
+
+	// 6) DELETE /auto/<string:mark> - удаляет информацию про автомобиль с именем mark из БД. В
+	//случае успеха - 202 и сообщение {"Message" : "Auto deleted"}. В случае, если автомобиля нет
+	//в БД в текущий момент возвращаем {"Error" : "Auto with that mark not found"} и код 404.
+	s.router.Handle(prefix+"/auto"+"/{mark}", middleware.JwtMiddleware.Handler(
+		http.HandlerFunc(s.DeleteAuto),
+	)).Methods("DELETE")
+
+	// 7) GET /stock - возвращает информацию про все имеющиеся на данный момент в БД автомобили
+	// и код 200 в случае, если имеется хотя бы один автомобиль в наличии. В противном случае - 400 и
+	// сообщение {"Error" : "No one autos found in DataBase"}.
+	s.router.Handle(prefix+"/stock", middleware.JwtMiddleware.Handler(
+		http.HandlerFunc(s.GetAllAutos),
+	)).Methods("GET")
+
 }
 
 //configureStore method

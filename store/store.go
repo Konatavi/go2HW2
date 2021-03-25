@@ -9,10 +9,10 @@ import (
 
 //Instance of store
 type Store struct {
-	config            *Config
-	db                *sql.DB
-	userRepository    *UserRepository
-	articleRepository *ArticleRepository
+	config                *Config
+	db                    *sql.DB
+	usersautoRepository   *UsersautoRepository
+	automobilesRepository *AutomobilesRepository
 }
 
 // Constructor for store
@@ -43,24 +43,24 @@ func (s *Store) Close() {
 	s.db.Close()
 }
 
-//Public for UserRepo
-func (s *Store) User() *UserRepository {
-	if s.userRepository != nil {
-		return s.userRepository
+//Public for UsersautoRepositoryRepo
+func (s *Store) Usersauto() *UsersautoRepository {
+	if s.usersautoRepository != nil {
+		return s.usersautoRepository
 	}
-	s.userRepository = &UserRepository{
+	s.usersautoRepository = &UsersautoRepository{
 		store: s,
 	}
-	return s.userRepository
+	return s.usersautoRepository
 }
 
 //Public for ArticleRepo
-func (s *Store) Article() *ArticleRepository {
-	if s.articleRepository != nil {
-		return s.articleRepository
+func (s *Store) Automobiles() *AutomobilesRepository {
+	if s.automobilesRepository != nil {
+		return s.automobilesRepository
 	}
-	s.articleRepository = &ArticleRepository{
+	s.automobilesRepository = &AutomobilesRepository{
 		store: s,
 	}
-	return s.articleRepository
+	return s.automobilesRepository
 }

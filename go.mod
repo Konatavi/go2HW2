@@ -1,4 +1,4 @@
-module github.com/vlasove/10.JWTAuth
+module github.com/Konatavi/go2HW2
 
 go 1.16
 
